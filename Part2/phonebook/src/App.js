@@ -73,7 +73,7 @@ const App = () =>{
             const search = event.target.value
             
             setNewSearch(event.target.value)
-            setShowPerson(persons.filter((person)=>person.name.toLowerCase().includes(search)))
+            setShowPerson(persons.filter((person)=>person.name.toLowerCase().includes(search.toLowerCase())))
     }
     //{persons.map(person=><Contact key={person.id} contact={person}/>)}
         /*
