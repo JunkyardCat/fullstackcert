@@ -1,7 +1,8 @@
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import Person from './components/Person'
 import PersonForm from './components/PersonForm'
 import Filter from './components/Filter'
+import personService from './services/persons'
 /*
 const Person = (props) =>{
         return (
@@ -41,34 +42,67 @@ const App = () =>{
     const [newSearch, setNewSearch]= useState('')
     const [showPerson, setShowPerson]= useState(persons)
     
-    //changed from host ip to localhost
     useEffect(() => {
-            
-            axios
-               .get('http://localhost:3001/persons')
-               .then(response =>{
-                       console.log('promise fulfilled')
-                       setPersons(response.data)
-                       setShowPerson(response.data)
-               })
+            console.log('effect')
+            personService.getAll().then(initialData=>{
+                    setShowPerson(initialData)
+                    setPersons(initialData)
+            })
     }, [])
+    console.log('render', persons.length, 'notes')
+    
+    const deleteContact = (id,name) =>{
+         if (window.confirm(`Delete ${name}?`)){   
+         personService.del(id).then((response)=>
+                 {
+                         const updatePerson = persons.filter((person)=>person.id !== id)
+                         setPersons(updatePerson)
+                         setShowPerson(updatePerson)
+                         console.log("inside delete",response)
+                 }
 
+         )
+         }
+    }
 
     const addContact = (event) =>{
        event.preventDefault()
        const dupeName = persons.filter((person)=>person.name===newName)
-       const nameObject = [{name: newName, number:newNumber, id:persons.length+1}]
+       const nameObject = {name: newName, number:newNumber, id:persons.length+1}
        if(dupeName.length===0)
        {
-          console.log("inside dupename",nameObject)
-          setPersons(persons.concat(nameObject))   
+          //setPersons(persons.concat(nameObject))   
                
-            setShowPerson(persons.concat(nameObject))
+            //setShowPerson(persons.concat(nameObject))
+               personService.create(nameObject).then(data=>
+                       {
+                           setPersons(persons.concat(data))
+                           setShowPerson(persons.concat(data))
+                       }
+               )
+               
                console.log(persons)
        }
        else{
+               if(window.confirm(`${newName} is already existing do you still wanna change it?`))
+               {
                console.log(dupeName)
-          window.confirm(`${newName} is already added ot the phonebook`)
+          //window.confirm(`${newName} is already added ot the phonebook`)
+            const searchPerson = persons.filter((person)=>person.name ===newName)
+               console.log("searchPerson",searchPerson)
+               searchPerson[0].number=newNumber
+               console.log("searchPerson",searchPerson)
+
+            personService.update(searchPerson[0].id, searchPerson[0]).then(data=>
+               {
+                       const updatedPerson = persons.map((person)=>person.id!==data.id ? person : data)
+                       console.log("inside update",data)
+                       console.log("inside update",updatedPerson)
+                   setPersons(updatedPerson)
+                   setShowPerson(updatedPerson)
+               }
+            )
+               }
        }
     }
     const handleNameChange = (event) =>{
@@ -81,6 +115,7 @@ const App = () =>{
             const search = event.target.value
             
             setNewSearch(event.target.value)
+            console.log(persons)
             setShowPerson(persons.filter((person)=>person.name.toLowerCase().includes(search.toLowerCase())))
     }
     //{persons.map(person=><Contact key={person.id} contact={person}/>)}
@@ -103,7 +138,7 @@ const App = () =>{
             
             </div>
             <h2>Numbers</h2>
-            <Person showPerson={showPerson}/>
+            <Person showPerson={showPerson} deleteContact={deleteContact}/>
          </div>
            )
 }
