@@ -3,6 +3,8 @@ import Person from './components/Person'
 import PersonForm from './components/PersonForm'
 import Filter from './components/Filter'
 import personService from './services/persons'
+import './index.css'
+import Notification from './components/Notification'
 /*
 const Person = (props) =>{
         return (
@@ -35,13 +37,35 @@ const Filter = (props) =>{
         )
 }
 */
+/*
+const Notification = ({message}) => {
+    if (message === null){
+        return null
+    }
+    if (message.includes("failed"))
+    {
+            console.log("failed message")
+            return (
+                 <div className="error">
+                    {message}
+                 </div>
+             )
+    }
+    return (
+            <div className="notif">
+             {message}
+            </div>
+           )
+}
+*/
 const App = () =>{
     const [persons, setPersons]= useState([])
     const [newName, setNewName]= useState('')
     const [newNumber, setNewNumber]= useState('')
     const [newSearch, setNewSearch]= useState('')
     const [showPerson, setShowPerson]= useState(persons)
-    
+    const [notifMessage, setNotifMessage]=useState('')
+
     useEffect(() => {
             console.log('effect')
             personService.getAll().then(initialData=>{
@@ -61,8 +85,17 @@ const App = () =>{
                          console.log("inside delete",response)
                  }
 
-         )
+         ).catch(error => {
+                         //alert(`user ${name} was already deleted from the server`)
+                 const updatePerson = persons.filter((person) => person.id !==id)
+                 setPersons(updatePerson)
+                 setShowPerson(updatePerson)
+                         setNotifMessage(`failed user ${name} was already deleted from the server`)
+                         setTimeout(()=>{setNotifMessage(null)},5000)
+
          }
+         )
+    }
     }
 
     const addContact = (event) =>{
@@ -80,7 +113,8 @@ const App = () =>{
                            setShowPerson(persons.concat(data))
                        }
                )
-               
+               setNotifMessage(`Added ${newName}`)
+               setTimeout(()=>{setNotifMessage(null)},5000)
                console.log(persons)
        }
        else{
@@ -102,6 +136,9 @@ const App = () =>{
                    setShowPerson(updatedPerson)
                }
             )
+               setNotifMessage(`Edited ${newName}'s number`)
+               setTimeout(()=>{setNotifMessage(null)},5000)
+
                }
        }
     }
@@ -133,6 +170,7 @@ const App = () =>{
         <div>
             <h2>Phonebook</h2>
             <div>
+            <Notification message={notifMessage}/>
             <Filter newSearch={newSearch} handleSearch={handleSearch}/>
             <PersonForm name={newName} number={newNumber} addContact={addContact} handleNameChange={handleNameChange} handleNumberChange={handleNumberChange}/>
             
