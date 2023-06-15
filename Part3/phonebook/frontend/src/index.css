@@ -1,0 +1,9 @@
+.notif{
+        color: green;
+        background: lightgrey;
+}
+
+.error{
+        color: red;
+        background: lightgrey;
+}
