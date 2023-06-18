@@ -63,7 +63,7 @@ const App = () =>{
     const [newName, setNewName]= useState('')
     const [newNumber, setNewNumber]= useState('')
     const [newSearch, setNewSearch]= useState('')
-    const [showPerson, setShowPerson]= useState(persons)
+    const [showPerson, setShowPerson]= useState([])
     const [notifMessage, setNotifMessage]=useState('')
 
     useEffect(() => {
@@ -112,8 +112,12 @@ const App = () =>{
                            setPersons(persons.concat(data))
                            setShowPerson(persons.concat(data))
                        }
-               )
-               setNotifMessage(`Added ${newName}`)
+               ).then(createdPerson=>{
+                   setNotifMessage(`Added ${newName}`)
+               }).catch(error =>{
+                       setNotifMessage(error.response.data.error)
+                       console.log(error.response.data.error)
+               })
                setTimeout(()=>{setNotifMessage(null)},5000)
                console.log(persons)
        }
@@ -123,21 +127,25 @@ const App = () =>{
                console.log(dupeName)
           //window.confirm(`${newName} is already added ot the phonebook`)
             const searchPerson = persons.filter((person)=>person.name ===newName)
-               console.log("searchPerson",searchPerson)
-               searchPerson[0].number=newNumber
-               console.log("searchPerson",searchPerson)
+               //searchPerson[0].number=newNumber
+               const tempValue = {name:searchPerson[0].name, number:newNumber, id:searchPerson[0].id}
 
-            personService.update(searchPerson[0].id, searchPerson[0]).then(data=>
+            personService.update(tempValue.id, tempValue).then(data=>
                {
                        const updatedPerson = persons.map((person)=>person.id!==data.id ? person : data)
                        console.log("inside update",data)
                        console.log("inside update",updatedPerson)
                    setPersons(updatedPerson)
                    setShowPerson(updatedPerson)
+                   setNotifMessage(`Edited ${newName}'s number`)
                }
-            )
-               setNotifMessage(`Edited ${newName}'s number`)
-               setTimeout(()=>{setNotifMessage(null)},5000)
+            ).catch(error=>{
+                    //setNewName('')
+                    //setNewNumber('')
+                    console.log(error.response.data.error)
+                    setNotifMessage(error.response.data.error)
+                    setTimeout(()=>{setNotifMessage(null)},5000)
+            })
 
                }
        }
@@ -149,6 +157,7 @@ const App = () =>{
             setNewNumber(event.target.value)
     }
     const handleSearch = (event) =>{
+            event.preventDefault()
             const search = event.target.value
             
             setNewSearch(event.target.value)
