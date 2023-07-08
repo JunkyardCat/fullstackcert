@@ -4,6 +4,9 @@ import ReactDOM from 'react-dom/client'
 import { Provider } from 'react-redux'
 import App from './App'
 import store from './store'
+//import anecdoteService from '../services/anecdotes'
+//import { setAnecdotes } from './reducers/anecdoteReducer'
+
 //import anecdoteReducer from './reducers/anecdoteReducer'
 //import filterReducer from './reducers/filterReducer'
 /*
@@ -19,6 +22,11 @@ const store = configureStore({
     anecdote: anecdoteReducer,
     filter: filterReducer
   }
+})
+*/
+/*
+anecdoteService.getAll.then(anecdotes => {
+  store.dispatch(setAnecdotes(anecdotes))
 })
 */
 
