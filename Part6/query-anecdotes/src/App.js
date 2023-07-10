@@ -2,20 +2,38 @@ import { useMutation, useQuery, useQueryClient } from 'react-query'
 import axios from 'axios'
 import AnecdoteForm from './components/AnecdoteForm'
 import Notification from './components/Notification'
-import { createAnecdote, getAnecdotes } from './requests'
+import { createAnecdote, getAnecdotes, updateAnecdote } from './requests'
 
 const App = () => {
   
   const queryClient = useQueryClient()
 
   const newAnecdoteMutation = useMutation(createAnecdote, {
-    onSuccess: () => {
-      queryClient.invalidateQueries('anecdotes')
+    onSuccess: (newAnecdote) => {
+      const anecdotes = queryClient.getQueryData('anecdotes')
+      queryClient.setQueryData('anecdotes', anecdotes.concat(newAnecdote))
+      //queryClient.invalidateQueries('anecdotes')
+    }
+  })
+  
+  const updateAnecdoteMutation = useMutation(updateAnecdote, {
+    onSuccess: (updatedAnecdote) => {
+      //console.log('updatedAnecdote1',updatedAnecdote)
+      const anecdotes = queryClient.getQueryData('anecdotes')
+      //console.log('update anecdote mutation',anecdotes)
+      //queryClient.setQueryData('anecdotes', anecdotes.concat(updatedAnecdote))
+      queryClient.setQueryData('anecdotes', anecdotes.map(anecdote => anecdote.id !== updatedAnecdote.id ? anecdote:updatedAnecdote ))
+      //queryClient.setQueryData('anecdotes',)
+      //queryClient.invalidateQueries('anecdotes')
     }
   })
 
   const handleVote = (anecdote) => {
-    console.log('vote')
+    updateAnecdoteMutation.mutate({ ...anecdote, votes: anecdote.votes+1 })
+    //console.log('vote',anecdote)
+    //console.log('vote 2',updateAnecdoteMutation.mutate({...anecdote, votes: anecdote.votes}))
+    console.log('vote 3',{...anecdote, votes:anecdote.votes+1})
+
   }
   /*
   const anecdotes = [
@@ -35,7 +53,9 @@ const App = () => {
     }
   )
   */
-  const result = useQuery('anecdotes',getAnecdotes)
+  const result = useQuery('anecdotes',getAnecdotes, {
+    refetchOnWindowFocus: false
+  })
 
   if(result.isLoading){
     return <div>loading data...</div>
