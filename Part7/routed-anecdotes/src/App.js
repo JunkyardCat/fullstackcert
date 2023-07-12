@@ -92,6 +92,12 @@ const CreateNew = (props) => {
     onChange: info.onChange
   }
 
+  const resetField = () => {
+    content.reset()
+    author.reset()
+    info.reset()
+  }
+
   return (
     <div>
       <h2>create a new anecdote</h2>
@@ -109,6 +115,7 @@ const CreateNew = (props) => {
           <input {...infoBundle} />
         </div>
         <button>create</button>
+        <button type='button' onClick={() => resetField()}>reset</button>
       </form>
     </div>
   )
