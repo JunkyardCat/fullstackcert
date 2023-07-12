@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Link, useParams } from 'react-router-dom'
 
 /*
 const Menu = () => {
@@ -20,7 +20,7 @@ const AnecdoteList = ({ anecdotes }) => (
   <div>
     <h2>Anecdotes</h2>
     <ul>
-      {anecdotes.map(anecdote => <li key={anecdote.id} >{anecdote.content}</li>)}
+      {anecdotes.map(anecdote => <li key={anecdote.id} ><Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link> </li>)}
     </ul>
   </div>
 )
@@ -43,7 +43,7 @@ const Footer = () => (
   <div>
     Anecdote app for <a href='https://github.com/JunkyardCat/fullstackcert/'>Full Stack - JunkyardCat</a>.
 
-    See <a href='https://github.com/JunkyardCat/fullstackcert/Part7/routed-anecdotes'>https://github.com/JunkyardCat/fullstackcert/Part7/routed-anecdotes</a> for the source code.
+    See <a href='https://github.com/JunkyardCat/fullstackcert/tree/master/Part7/routed-anecdotes'>https://github.com/JunkyardCat/fullstackcert/Part7/routed-anecdotes</a> for the source code.
   </div>
 )
 
@@ -84,6 +84,18 @@ const CreateNew = (props) => {
     </div>
   )
 
+}
+
+const Anecdote =({ anecdotes }) =>{
+  const id = useParams().id
+  const anecdote = anecdotes.find(n => n.id === Number(id))
+  return (
+    <div>
+      <h2>{anecdote.content} by {anecdote.author}</h2>
+      <div>has {anecdote.votes} votes</div>
+      <div>for more info see <a href={anecdote.info}>{anecdote.info}</a></div>
+    </div>
+  )
 }
 
 const App = () => {
@@ -140,6 +152,7 @@ const App = () => {
       </div>
     
       <Routes>
+        <Route path='/anecdotes/:id' element={<Anecdote anecdotes={anecdotes}/>} />
         <Route path='/' element={<AnecdoteList anecdotes={anecdotes} />} />
         <Route path='/anecdotes' element={<AnecdoteList anecdotes={anecdotes} />} />
         <Route path='/createNew' element={<CreateNew addNew={addNew}/>} />
