@@ -1,0 +1,9 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+   "title": "Hi i am junk lol 2",
+   "author": "JunkyardBoy",
+   "url": "lets.a.go",
+   "likes": "797"
+}

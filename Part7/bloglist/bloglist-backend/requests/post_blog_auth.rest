@@ -1,0 +1,10 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjY0OTliMDU0YWQ4YTkyMDdlNzMwOTQ2OCIsImlhdCI6MTY4Nzg2OTQ4NX0.CprdbBRXPtaTEakfc6mYbYwM_3wUVnyxpjnuOnK6GTI
+
+{
+   "title": "Hi i am junk lol 2",
+   "author": "JunkyardBoy",
+   "url": "lets.a.go",
+   "likes": "797"
+}
