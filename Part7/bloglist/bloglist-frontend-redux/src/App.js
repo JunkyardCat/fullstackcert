@@ -7,17 +7,29 @@ import BlogForm from './components/BlogForm'
 import Toggleable from './components/Toggleable'
 //import axios from 'axios'
 import { setNotification } from './reducers/notificationReducer'
-import { useDispatch } from 'react-redux'
+import {
+  createBlogFxn,
+  deleteBlogFxn,
+  initializeBlog,
+  likeBlogFxn,
+} from './reducers/blogReducer'
+import { useDispatch, useSelector } from 'react-redux'
+import Blogs from './components/Blogs'
+import { userLogout, userLogin } from './reducers/userLoginReducer'
+import LoginForm from './components/LoginForm'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
+  //const [blogs, setBlogs] = useState([])
   const [errorMessage, setErrorMessage] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  console.log(errorMessage)
+  //console.log(errorMessage)
   const dispatch = useDispatch()
+  const loggedInUser = useSelector(({ user }) => user)
+  //console.log('App logged', loggedInUser)
 
+  /*
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs))
   }, [])
@@ -30,6 +42,19 @@ const App = () => {
       blogService.setToken(user.token)
     }
   }, [])
+  */
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      //setUser(user)
+      dispatch(userLogin(user))
+      //console.log('loggedUserJson')
+      blogService.setToken(user.token)
+    }
+    //console.log('useEffect', loggedUserJSON)
+    dispatch(initializeBlog())
+  }, [dispatch])
 
   const handleLogin = async (event) => {
     try {
@@ -53,7 +78,8 @@ const App = () => {
   }
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser')
-    setUser(null)
+    //setUser(null)
+    dispatch(userLogout())
   }
 
   const loginForm = () => {
@@ -88,8 +114,11 @@ const App = () => {
 
   const createBlog = async (title, author, url) => {
     try {
-      const blog = await blogService.create({ title, author, url })
-      setBlogs(blogs.concat(blog))
+      //const blog = await blogService.create({ title, author, url })
+      //setBlogs(blogs.concat(blog))
+      const content = { title, author, url }
+      dispatch(createBlogFxn(content))
+
       //setErrorMessage(`a new blog ${title} by ${author} added`)
       /*
       setTimeout(() => {
@@ -106,15 +135,18 @@ const App = () => {
   const updateLikes = async (id, blogUpdate) => {
     try {
       //console.log('updateLikes before',id,blogUpdate)
-      const updatedBlog = await blogService.update(id, blogUpdate)
+      //const updatedBlog = await blogService.update(id, blogUpdate)
       //console.log('updateBlog',updatedBlog)
       //console.log('blogs content',blogs)
+      /*
       const newBlogs = blogs.map((blog) =>
         blog.id === id ? updatedBlog : blog
       )
+      */
+      dispatch(likeBlogFxn(id, blogUpdate))
       //console.log('newBlog',newBlogs)
       //console.log('blogs',blogs)
-      setBlogs(newBlogs)
+      //setBlogs(newBlogs)
       //console.log('end',newBlogs)
     } catch (exception) {
       setErrorMessage('error' + exception)
@@ -125,9 +157,10 @@ const App = () => {
   }
 
   const deleteBlog = async (id) => {
-    await blogService.deleteOneBlog(id)
-    const updatedBlog = blogs.filter((blog) => blog.id !== id)
-    setBlogs(updatedBlog)
+    //await blogService.deleteOneBlog(id)
+    //const updatedBlog = blogs.filter((blog) => blog.id !== id)
+    //setBlogs(updatedBlog)
+    dispatch(deleteBlogFxn(id))
     dispatch(setNotification('blog removed'))
     //setErrorMessage('blog removed')
     /*
@@ -151,9 +184,18 @@ const App = () => {
 
   const showBlog = () => {
     //changeme please change username to name as soon as more users are added to db with name
+    //console.log('inside showblog')
+
+    const blogStore = [
+      { title: 'hello', author: 'governer', url: 'www.google.com', like: 0 },
+    ]
+
+    //const blogStore2 = useSelector((state) => state.blog)
+    //console.log('after selector2')
+    //console.log('inside showblog', blogStore)
     return (
       <div>
-        <p>{user.username} logged in</p>
+        <p>{user.name} logged in</p>
         <form onSubmit={handleLogout}>
           <button id="logout-button" type="submit">
             log out
@@ -162,7 +204,7 @@ const App = () => {
         <Toggleable buttonLabel="new blog">
           <BlogForm createBlog={createBlog} />
         </Toggleable>
-        {blogs
+        {blogStore
           .sort((a, b) => b.likes - a.likes)
           .map((blog) => (
             <Blog
@@ -177,11 +219,26 @@ const App = () => {
     )
   }
 
+  /*
   return (
     <div>
       <h2>blogs</h2>
       <Notification />
       {user === null ? loginForm() : showBlog()}
+    </div>
+  )
+  */
+  return (
+    <div>
+      <h2>blogs</h2>
+      <Notification />
+      {/*user === null ? loginForm() : null*/}
+
+      {loggedInUser === null ? (
+        <LoginForm />
+      ) : (
+        <Blogs username={loggedInUser.username} />
+      )}
     </div>
   )
 }
