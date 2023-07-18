@@ -6,6 +6,10 @@ import loginService from './services/login'
 import BlogForm from './components/BlogForm'
 import Toggleable from './components/Toggleable'
 import { useNotificationDispatch } from './NotificationContext'
+import { useQueryClient, useQuery } from 'react-query'
+import Blogs from './components/Blogs'
+import { setToken } from './requests'
+import { useUserDispatch, useUserValue } from './userContext'
 //import axios from 'axios'
 
 const App = () => {
@@ -15,6 +19,9 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const dispatch = useNotificationDispatch()
+  const queryClient = useQueryClient()
+  const userDispatch = useUserDispatch()
+  const userValue = useUserValue()
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs))
@@ -24,8 +31,13 @@ const App = () => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user)
-      blogService.setToken(user.token)
+      //setUser(user)
+      //blogService.setToken(user.token)
+      userDispatch({
+        type: 'SET_USER',
+        payload: user,
+      })
+      setToken(user.token)
     }
   }, [])
 
@@ -33,9 +45,14 @@ const App = () => {
     try {
       event.preventDefault()
       const user = await loginService.login({ username, password })
-      blogService.setToken(user.token)
+      //blogService.setToken(user.token)
       window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
-      setUser(user)
+      userDispatch({
+        type: 'SET_USER',
+        payload: user,
+      })
+      setToken(user.token)
+      //setUser(user)
       setUsername('')
       setPassword('')
     } catch (exception) {
@@ -197,7 +214,11 @@ const App = () => {
     <div>
       <h2>blogs</h2>
       <Notification />
-      {user === null ? loginForm() : showBlog()}
+      {userValue === null ? (
+        loginForm()
+      ) : (
+        <Blogs username={userValue.username} />
+      )}
     </div>
   )
 }
