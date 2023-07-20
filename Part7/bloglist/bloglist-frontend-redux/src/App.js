@@ -17,6 +17,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import Blogs from './components/Blogs'
 import { userLogout, userLogin } from './reducers/userLoginReducer'
 import LoginForm from './components/LoginForm'
+import Users from './components/Users'
+import User from './components/User'
+import { Route, Routes } from 'react-router-dom'
+import { initializeUsers } from './reducers/usersReducer'
+import BlogDetail from './components/BlogDetail'
+import { Link } from 'react-router-dom'
+import { initializeComment } from './reducers/commentReducer'
 
 const App = () => {
   //const [blogs, setBlogs] = useState([])
@@ -54,6 +61,8 @@ const App = () => {
     }
     //console.log('useEffect', loggedUserJSON)
     dispatch(initializeBlog())
+    dispatch(initializeUsers())
+    dispatch(initializeComment())
   }, [dispatch])
 
   const handleLogin = async (event) => {
@@ -228,16 +237,49 @@ const App = () => {
     </div>
   )
   */
+
+  const handleLogOut = () => {
+    window.localStorage.removeItem('loggedBlogappUser')
+    dispatch(userLogout())
+  }
+
+  const padding = {
+    padding: 5,
+  }
+
   return (
     <div>
+      <div>
+        <Link style={padding} to="/">
+          blog
+        </Link>
+        <Link style={padding} to="/users">
+          users
+        </Link>
+      </div>
       <h2>blogs</h2>
       <Notification />
-      {/*user === null ? loginForm() : null*/}
 
       {loggedInUser === null ? (
         <LoginForm />
       ) : (
-        <Blogs username={loggedInUser.username} />
+        <>
+          <p>{loggedInUser.username} logged in lol</p>
+          <form onSubmit={handleLogOut}>
+            <button id="logout-button2" type="submit">
+              log out
+            </button>
+          </form>
+          <Routes>
+            <Route
+              path="/"
+              element={<Blogs username={loggedInUser.username} />}
+            />
+            <Route path="/users" element={<Users />} />
+            <Route path="/users/:id" element={<User />} />
+            <Route path="/blogs/:id" element={<BlogDetail />} />
+          </Routes>
+        </>
       )}
     </div>
   )

@@ -40,6 +40,34 @@ const Blog = ({ blog, username }) => {
       //deleteBlog(blog.id)
     }
   }
+  /*
+  return (
+    <div className="blog">
+      <div>
+        <span className="title">{blog.title} - </span>
+        <span className="author">{blog.author}</span>
+        <button onClick={toggleVisibility}>{visible ? 'hide' : 'show'}</button>
+      </div>
+      {visible && (
+        <div className="blog-details">
+          <div>
+            likes:{blog.likes}
+            <button id="like-button" onClick={handleLike}>
+              like
+            </button>
+          </div>
+          <div>url:{blog.url}</div>
+          <div>{blog.user.username}</div>
+          {blog.user.username === username && (
+            <button id="delete-button" onClick={handleDelete}>
+              delete
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  )
+  */
   return (
     <div className="blog">
       <div>
