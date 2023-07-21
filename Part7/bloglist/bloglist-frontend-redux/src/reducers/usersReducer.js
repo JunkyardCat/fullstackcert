@@ -6,7 +6,7 @@ const usersSlice = createSlice({
   initialState: [],
   reducers: {
     setUsers(state, action) {
-      console.log('iniside slice')
+      //console.log('iniside slice')
       return action.payload
     },
   },
@@ -16,7 +16,7 @@ export const { setUsers } = usersSlice.actions
 
 export const initializeUsers = () => {
   return async (dispatch) => {
-    console.log('inside intialzie')
+    //console.log('inside intialzie')
     const users = await usersService.getUsers()
     dispatch(setUsers(users))
   }

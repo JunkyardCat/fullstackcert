@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { likeBlogFxn } from '../reducers/blogReducer'
 import Comment from './Comment'
+import { Button } from 'react-bootstrap'
 
 const BlogDetail = () => {
   const { id } = useParams()
@@ -30,7 +31,7 @@ const BlogDetail = () => {
       </a>
       <div>
         likes:{blog.likes}
-        <button onClick={updateLikes}>like</button>
+        <Button onClick={updateLikes}>like</Button>
       </div>
       <p>added by {blog.author}</p>
       <Comment blog={blog} />

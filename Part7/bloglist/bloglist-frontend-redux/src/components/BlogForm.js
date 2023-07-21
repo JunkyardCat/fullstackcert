@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { createBlogFxn } from '../reducers/blogReducer'
 import { setNotification } from '../reducers/notificationReducer'
+import { Form, Button } from 'react-bootstrap'
 
 const BlogForm = () => {
   const [newBlog, setNewBlog] = useState({ title: '', author: '', url: '' })
@@ -35,35 +36,32 @@ const BlogForm = () => {
   }
   return (
     <div>
-      <form onSubmit={handleCreate}>
-        title:{' '}
-        <input
+      <Form onSubmit={handleCreate}>
+        <Form.Label>title:</Form.Label>
+        <Form.Control
           type="text"
-          id="input-title"
-          name="title"
           onChange={handleInputChange}
+          name="title"
           value={newBlog.title}
         />
-        author:{' '}
-        <input
+        <Form.Label>author:</Form.Label>
+        <Form.Control
           type="text"
-          id="input-author"
-          name="author"
           onChange={handleInputChange}
+          name="author"
           value={newBlog.author}
         />
-        url:{' '}
-        <input
+        <Form.Label>url:</Form.Label>
+        <Form.Control
           type="text"
-          id="input-url"
-          name="url"
           onChange={handleInputChange}
+          name="url"
           value={newBlog.url}
         />
-        <button id="create-blog" type="submit">
+        <Button variant="primary" type="submit">
           add blog
-        </button>
-      </form>
+        </Button>
+      </Form>
     </div>
   )
 }

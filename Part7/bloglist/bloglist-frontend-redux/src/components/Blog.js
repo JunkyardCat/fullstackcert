@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { deleteBlogFxn, likeBlogFxn } from '../reducers/blogReducer'
 import { setNotification } from '../reducers/notificationReducer'
+import { Button } from 'react-bootstrap'
 
 const Blog = ({ blog, username }) => {
   //const blogtest = useSelector((state) => state.blog)
@@ -79,9 +80,9 @@ const Blog = ({ blog, username }) => {
         <div className="blog-details">
           <div>
             likes:{blog.likes}
-            <button id="like-button" onClick={handleLike}>
+            <Button id="like-button" onClick={handleLike}>
               like
-            </button>
+            </Button>
           </div>
           <div>url:{blog.url}</div>
           <div>{blog.user.username}</div>

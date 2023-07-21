@@ -22,8 +22,10 @@ import User from './components/User'
 import { Route, Routes } from 'react-router-dom'
 import { initializeUsers } from './reducers/usersReducer'
 import BlogDetail from './components/BlogDetail'
-import { Link } from 'react-router-dom'
+//import { Link } from 'react-router-dom'
 import { initializeComment } from './reducers/commentReducer'
+import Menu from './components/Menu'
+import { Button } from 'react-bootstrap'
 
 const App = () => {
   //const [blogs, setBlogs] = useState([])
@@ -242,21 +244,14 @@ const App = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     dispatch(userLogout())
   }
-
+  /*
   const padding = {
     padding: 5,
   }
-
+*/
   return (
-    <div>
-      <div>
-        <Link style={padding} to="/">
-          blog
-        </Link>
-        <Link style={padding} to="/users">
-          users
-        </Link>
-      </div>
+    <div className="container">
+      <Menu />
       <h2>blogs</h2>
       <Notification />
 
@@ -266,9 +261,9 @@ const App = () => {
         <>
           <p>{loggedInUser.username} logged in lol</p>
           <form onSubmit={handleLogOut}>
-            <button id="logout-button2" type="submit">
+            <Button id="logout-button2" type="submit">
               log out
-            </button>
+            </Button>
           </form>
           <Routes>
             <Route

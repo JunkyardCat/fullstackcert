@@ -5,6 +5,7 @@ import BlogForm from './BlogForm'
 //import { userLogout } from '../reducers/userLoginReducer'
 import { setNotification } from '../reducers/notificationReducer'
 import { Link } from 'react-router-dom'
+import { Table } from 'react-bootstrap'
 
 const Blogs = () => {
   const dispatch = useDispatch()
@@ -49,7 +50,7 @@ const Blogs = () => {
         <Toggleable buttonLabel="new blog">
           <BlogForm />
         </Toggleable>
-        <table>
+        <Table striped>
           <tbody>
             {blogStore.map((blog) => (
               <tr key={blog.id}>
@@ -61,7 +62,7 @@ const Blogs = () => {
               </tr>
             ))}
           </tbody>
-        </table>
+        </Table>
       </div>
     )
   } catch (e) {

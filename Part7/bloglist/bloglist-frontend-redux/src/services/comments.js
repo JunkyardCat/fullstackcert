@@ -7,7 +7,7 @@ const getAll = async () => {
 }
 const addComment = async (newComment) => {
   const response = await axios.post(baseUrl, newComment)
-  console.log('inside service addComment', response, response.data)
+  //console.log('inside service addComment', response, response.data)
   return response.data
 }
 
