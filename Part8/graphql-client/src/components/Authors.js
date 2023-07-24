@@ -17,9 +17,11 @@ const Authors = (props) => {
   if (result.loading) {
     return <div>loading...</div>
   }
+  const authors = result.data.allAuthors || []
 
   const handleSetBirthyear = async (event) => {
     event.preventDefault()
+    console.log(name, born)
     editAuthor({
       variables: { name, setBornTo: parseInt(born) },
     })
@@ -27,7 +29,7 @@ const Authors = (props) => {
     setBorn('')
   }
 
-  const authors = result.data.allAuthors || []
+  const names = authors.map((n) => n.name)
 
   return (
     <div>
@@ -54,10 +56,17 @@ const Authors = (props) => {
       <form onSubmit={handleSetBirthyear}>
         <div>
           name{' '}
-          <input
+          <select
             value={name}
             onChange={({ target }) => setName(target.value)}
-          />
+            placeholder=""
+          >
+            {names.map((name, i) => (
+              <option key={i} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
         </div>
         <div>
           born{' '}
