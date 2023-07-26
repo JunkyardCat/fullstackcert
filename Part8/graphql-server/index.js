@@ -5,6 +5,7 @@ const {
 } = require('@apollo/server')
 const { startStandaloneServer } = require('@apollo/server/standalone')
 const { v1: uuid } = require('uuid')
+require('dotenv').config()
 
 const mongoose = require('mongoose')
 mongoose.set('strictQuery', false)
@@ -123,45 +124,45 @@ let books = [
 */
 
 const typeDefs = `
-type Author {
-  name: String!
-  id: ID!
-  born: Int
-  bookCount: Int!
-}
-type Book {
-  title: String!
-  published: Int!
-  author: Author!
-  id: ID!
-  genres: [String]!
-}
-type User {
-  username: String!
-  password: String!
-  id: ID!
-}
-type Token{
-  value: String!
-}
-type Query {
-  bookCount: Int!
-  authorCount: Int!
-  allBooks(author: String, genre: String): [Book]!
-  allAuthors: [Author]!
-  me: User
-}
-type Mutation {
-  addBook(
+  type Author {
+    name: String!
+    id: ID!
+    born: Int
+    bookCount: Int!
+  }
+  type Book {
     title: String!
     published: Int!
-    author: String!
+    author: Author!
+    id: ID!
     genres: [String]!
-  ): Book
-  editAuthor(name: String!, setBornTo: Int!): Author
-  createUser(username: String!, favoriteGenre: String!): User
-  login(username: String!, password: String!): Token
-}
+  }
+  type User {
+    username: String!
+    password: String!
+    id: ID!
+  }
+  type Token {
+    value: String!
+  }
+  type Query {
+    bookCount: Int!
+    authorCount: Int!
+    allBooks(author: String, genre: String): [Book]!
+    allAuthors: [Author]!
+    me: User
+  }
+  type Mutation {
+    addBook(
+      title: String!
+      published: Int!
+      author: String!
+      genres: [String]!
+    ): Book
+    editAuthor(name: String!, setBornTo: Int!): Author
+    createUser(username: String!, favoriteGenre: String!): User
+    login(username: String!, password: String!): Token
+  }
 `
 
 const resolvers = {
@@ -239,24 +240,38 @@ const resolvers = {
         throw new AuthenticationError('not authenticated')
       }
 
+      console.log('inside addBook server mutation', args, context.currentUser)
       let author = await Author.findOne({ name: args.author })
+      console.log('inside addBook server mutation 02', author)
       if (!author) {
+        console.log('inisde !author')
         author = new Author({ name: args.author })
         try {
           await author.save()
+          console.log('passed saving author')
         } catch (error) {
-          throw new UserInputError(error.message, { invalidArgs: args })
+          console.log('inside author error', error.message)
+          throw new UserInputError(error.message)
         }
       }
-      const book = new Book({ ...args, author: author.id })
+      const book = await new Book({ ...args, author: author.id }).populate(
+        'author'
+      )
+      console.log('after getting new book', book)
       try {
         await book.save()
+        console.log('pass saving books')
       } catch (error) {
+        console.log('inside book error', error.message)
         throw new UserInputError(error.message, { invalidArgs: args })
       }
+      console.log('inside addBook server mutation 03 final step', book)
+      const temp = await book.populate('author')
+      console.log('inside final 04', temp)
       return book
+      //return temp
     },
-    editAuthor: async (root, args) => {
+    editAuthor: async (root, args, context) => {
       /*
       const author = authors.find((author) => author.name === args.name)
       if (!author) return null
@@ -277,6 +292,7 @@ const resolvers = {
       } catch (error) {
         throw new UserInputError(error.message, { invalidArgs: args })
       }
+      console.log('inside editAutho server', author)
       return author
     },
     createUser: async (root, args) => {
@@ -287,14 +303,17 @@ const resolvers = {
     },
     login: async (root, args) => {
       const user = await User.findOne({ username: args.username })
-      if (!user || args.password !== 'secret') {
-        throw new UserInputError(error.message, { invalidArgs: args })
+      const test = await User.find({})
+      console.log('login 01', user, args.username)
+      if (!user || args.password !== '1234') {
+        console.log('inside login error', error.message)
+        throw new UserInputError('wrong credentials')
       }
       const userToken = {
         username: user.username,
         id: user._id,
       }
-      return { value: jwt.sign(userForToken, process.env.SECRET) }
+      return { value: jwt.sign(userToken, process.env.SECRET) }
     },
   },
 }
@@ -308,11 +327,11 @@ startStandaloneServer(server, {
   listen: { port: 4000 },
   context: async ({ req, res }) => {
     const auth = req ? req.headers.authorization : null
+    console.log('serverstart', auth)
     if (auth && auth.startsWith('Bearer ')) {
-      const decodedToken = jwt.verify(auth.substring(7), process.env.JWT_SECRET)
-      const currentUser = await User.findById(decodedToken.id).populate(
-        'friends'
-      )
+      const decodedToken = jwt.verify(auth.substring(7), process.env.SECRET)
+      const currentUser = await User.findById(decodedToken.id)
+      console.log('inside auth', decodedToken, currentUser)
       return { currentUser }
     }
   },

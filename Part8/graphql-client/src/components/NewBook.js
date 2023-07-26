@@ -11,6 +11,12 @@ const NewBook = (props) => {
 
   const [addBook] = useMutation(ADD_BOOK, {
     refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
+    onError: (error) => {
+      console.log('inside addBook error', error)
+      error.graphQLErrors > 0
+        ? props.setError(error.graphQLErrors[0].message)
+        : props.setError(error.message)
+    },
   })
 
   if (!props.show) {
@@ -21,9 +27,11 @@ const NewBook = (props) => {
     event.preventDefault()
 
     console.log('add book...')
+    console.log('inside newBook', title, author, published, genres)
     addBook({
       variables: { title, author, published: parseInt(published), genres },
     })
+    console.log('after addBook')
 
     setTitle('')
     setPublished('')
