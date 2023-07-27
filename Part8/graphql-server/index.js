@@ -139,7 +139,7 @@ const typeDefs = `
   }
   type User {
     username: String!
-    password: String!
+    favoriteGenre: String!
     id: ID!
   }
   type Token {

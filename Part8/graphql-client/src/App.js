@@ -4,6 +4,8 @@ import Books from './components/Books'
 import NewBook from './components/NewBook'
 import LoginForm from './components/LoginForm'
 import { useApolloClient } from '@apollo/client'
+import Recommend from './components/Recommend'
+import { useEffect } from 'react'
 
 const Notify = ({ errorMessage }) => {
   if (!errorMessage) {
@@ -63,8 +65,18 @@ const App = () => {
       return <Books show={page === 'books'} />
     } else if (page === 'add') {
       return <NewBook show={page === 'add'} setError={setErrorMessage} />
+    } else if (page === 'recommend') {
+      return <Recommend show={page === 'recommend'} />
     }
   }
+
+  useEffect(() => {
+    const getToken = localStorage.getItem('author-book-token')
+    if (getToken) {
+      setToken(getToken)
+    }
+  }, [])
+
   return (
     <div>
       <div>
@@ -73,7 +85,7 @@ const App = () => {
         {token ? (
           <span>
             <button onClick={toPage('add')}>add book</button>
-
+            <button onClick={toPage('recommend')}>recommend</button>
             <button onClick={logout}>logout</button>
           </span>
         ) : (
