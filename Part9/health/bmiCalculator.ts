@@ -34,6 +34,7 @@ export const calculateBmi = (height: number, mass: number): string => {
   } else if (bmi >= 30.0) {
     return "Obese";
   }
+  return "";
 };
 
 try {
