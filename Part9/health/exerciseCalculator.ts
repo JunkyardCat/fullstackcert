@@ -50,6 +50,7 @@ export const calculateExercises = (
     if (average < target * 0.5) return 1;
     if (average < target) return 2;
     if (average >= target) return 3;
+    return 0;
   };
 
   const getRatingDescription = (rating: number): string => {
@@ -62,6 +63,7 @@ export const calculateExercises = (
     if (rating === 3) {
       return "super congratulations";
     }
+    return "";
   };
 
   const rating = getRating(average, target);
