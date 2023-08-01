@@ -41,6 +41,7 @@ export const calculateExercises = (
   target: number,
   timeDaily: number[]
 ): Result => {
+  console.log("inside calculateExercises", target, timeDaily);
   const periodLength = timeDaily.length;
   const trainingDays = timeDaily.filter((hour) => hour > 0).length;
   const average = timeDaily.reduce((a, b) => a + b, 0) / periodLength;
