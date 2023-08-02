@@ -7,8 +7,8 @@ const Header = ({ courseName: string }) => {
 interface HeaderProps {
   courseName: string;
 }
-const Header = (props: HeaderProps): JSX.Element => {
-  return <h1>{props.courseName}</h1>;
+const Header = ({ courseName }: HeaderProps): JSX.Element => {
+  return <h1>{courseName}</h1>;
 };
 
 export default Header;
