@@ -70,49 +70,57 @@ function App() {
         <div>
           Date:{" "}
           <input
-            type="string"
+            type="date"
             id="dateinput"
             value={newDiary.date}
             onChange={(e) => setNewDiary({ ...newDiary, date: e.target.value })}
           />
         </div>
         <div>
-          Weather:{" "}
-          <input
-            type="string"
-            id="weatherinput"
-            value={newDiary.weather}
-            onChange={(e) =>
-              setNewDiary({ ...newDiary, weather: e.target.value as Weather })
-            }
-          />
+          Weather: <br />
+          {Object.values(Weather).map((w, i) => (
+            <>
+              <input
+                type="radio"
+                id={w}
+                key={i + "weather"}
+                name="weatherradio"
+                onChange={() => setNewDiary({ ...newDiary, weather: w })}
+                checked={newDiary.weather === w}
+              />
+              <label key={w + "label"}>{w}</label>
+            </>
+          ))}
         </div>
         <div>
-          Visibility:{" "}
-          <input
-            type="string"
-            id="visibilityinput"
-            value={newDiary.visibility}
-            onChange={(e) =>
-              setNewDiary({
-                ...newDiary,
-                visibility: e.target.value as Visibility,
-              })
-            }
-          />
+          Visibility: <br />
+          {Object.values(Visibility).map((w, i) => (
+            <>
+              <input
+                type="radio"
+                id={w}
+                key={i + "visibility"}
+                name="visibilityradio"
+                onChange={() => setNewDiary({ ...newDiary, visibility: w })}
+                checked={newDiary.visibility === w}
+              />
+              <label key={w + "label"}>{w}</label>
+            </>
+          ))}
         </div>
         <div>
           Comment:{" "}
           <input
             type="string"
             id="commentinput"
+            key="comment"
             value={newDiary.comment}
             onChange={(e) =>
               setNewDiary({ ...newDiary, comment: e.target.value })
             }
           />
         </div>
-        <button type="submit">submit</button>
+        <button type="submit">add</button>
       </form>
       <h2> diary entries</h2>
       {diary.map((x, y) => (
