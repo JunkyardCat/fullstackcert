@@ -5,12 +5,16 @@ import "./App.css";
 import {
   NewDiaryEntry,
   NonSensitiveDiaryEntry,
+  ValidationError,
   Visibility,
   Weather,
 } from "./types";
+import axios from "axios";
+import { isValidationError } from "./utils";
 
 function App() {
   const [diary, setDiary] = useState<NonSensitiveDiaryEntry[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const initialNewDiary = {
     date: "",
     weather: Weather.Sunny,
@@ -20,16 +24,33 @@ function App() {
   const [newDiary, setNewDiary] = useState<NewDiaryEntry>({
     ...initialNewDiary,
   });
+
   const addDiaryEntry = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     try {
       const newDiaryTemp = await diaryService.create(newDiary);
       setDiary(diary.concat(newDiaryTemp));
       setNewDiary({ ...initialNewDiary });
-    } catch (error: unknown) {
-      console.log(error instanceof Error ? error.message : "Unknown");
+    } catch (error) {
+      if (axios.isAxiosError<ValidationError, Record<string, unknown>>(error)) {
+        console.log("test", error.status, error.response);
+        if (error.response && isValidationError(error.response)) {
+          console.log("im inside", error.response.data);
+          const temp = String(error.response.data);
+          //const temp: string = validationError;
+          setErrorMessage(temp);
+          setTimeout(() => setErrorMessage(null), 5000);
+        } else {
+          console.log("unknown axios error");
+        }
+      } else if (error instanceof Error) {
+        console.log(error.message);
+      } else {
+        console.log("unkown error");
+      }
     }
   };
+
   const initializeDiaryEntries = async () => {
     console.log("start of initialize");
     const res = await diaryService.getAll();
@@ -40,8 +61,10 @@ function App() {
   useEffect(() => {
     initializeDiaryEntries();
   }, []);
+
   return (
     <div className="App">
+      {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
       <h2>add new</h2>
       <form id="newEntry" onSubmit={addDiaryEntry}>
         <div>
@@ -95,8 +118,8 @@ function App() {
       {diary.map((x, y) => (
         <div key={y}>
           <h3>{x.date}</h3>
-          <p>visibility{x.visibility}</p>
-          <p>weather{x.weather}</p>
+          <p>visibility: {x.visibility}</p>
+          <p>weather: {x.weather}</p>
         </div>
       ))}
     </div>

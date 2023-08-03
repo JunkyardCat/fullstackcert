@@ -1,3 +1,8 @@
+export interface ValidationError {
+  message: string;
+  //errors: Record<string, string[]>;
+}
+
 export enum Weather {
   Sunny = "sunny",
   Rainy = "rainy",
