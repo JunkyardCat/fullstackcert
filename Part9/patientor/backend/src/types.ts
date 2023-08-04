@@ -9,6 +9,8 @@ export interface DiagnosesEntry {
   latin?: string;
 }
 
+export interface Entry {}
+
 export interface PatientsEntry {
   id: string;
   name: string;
@@ -16,7 +18,8 @@ export interface PatientsEntry {
   ssn: string;
   gender: string;
   occupation: string;
+  entries: Entry[];
 }
 
-export type NonSensitivePatientEntry = Omit<PatientsEntry, "ssn">;
+export type NonSensitivePatientEntry = Omit<PatientsEntry, "ssn" | "entries">;
 export type NewPatientEntry = Omit<PatientsEntry, "id">;
