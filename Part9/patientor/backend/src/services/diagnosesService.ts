@@ -12,7 +12,12 @@ const addDiagnoses = () => {
   return null;
 };
 
+const getDiagCode = (codes: string[]): DiagnosesEntry[] => {
+  return diagnosesData.filter(x=>codes.includes(x.code))
+}
+
 export default {
   getEntries,
   addDiagnoses,
+  getDiagCode
 };

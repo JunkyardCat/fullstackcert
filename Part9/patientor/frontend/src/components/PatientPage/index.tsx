@@ -3,9 +3,11 @@ import MaleIcon from "@mui/icons-material/Male";
 import FemaleIcon from "@mui/icons-material/Female";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Patient } from "../../types";
+import { DiagnosesEntry, Entry, Patient } from "../../types";
 import patientService from "../../services/patients";
+import diagnosisService from '../../services/diagnoses'
 import TransgenderIcon from "@mui/icons-material/Transgender";
+import {isString} from '../../utils'
 
 const HandleGender = ({patient}: {patient: Patient}) => {
   //console.log(patient.gender, typeof patient.gender)
@@ -33,6 +35,7 @@ const HandleGender = ({patient}: {patient: Patient}) => {
 const PatientPage = () => {
   const { id } = useParams<{ id: string | undefined }>();
   const [patient, setPatient] = useState<Patient>();
+  const [diagnoses, setDiagnoses] = useState<DiagnosesEntry[]>([])
 
   
   const fetchPatient = async () => {
@@ -46,6 +49,19 @@ const PatientPage = () => {
     //console.log(typeof patient.gender)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  
+  const fetchDiagnoses = async (entries: Entry[])=> {
+    const diagCodes = entries.map(x=>x.diagnosisCodes).flat().filter(isString)
+    console.log('inside fetch before get',diagCodes)
+    const diagnoses = await diagnosisService.getCode(diagCodes)
+    console.log('inside fetch',diagnoses)
+    setDiagnoses(diagnoses)
+  }
+
+  useEffect(()=> {
+    if(patient)
+    void fetchDiagnoses(patient.entries)
+  },[patient])
 
   if (!patient) return null;
 
@@ -63,9 +79,9 @@ const PatientPage = () => {
           patient.entries && patient.entries.map((x,y)=>(
             <div key={y}>
               <Typography variant='body1'>{x.date} {x.description}</Typography>
-              {x.diagnosisCodes && (
+              {diagnoses && (
                 <ul>
-                  {x.diagnosisCodes.map((a,b)=>(<li key={b}>{a}</li>))}
+                  {diagnoses.map((a,b)=>(<li key={b}>{a.code} {a.name}</li>))}
                 </ul>
               )}
             </div>

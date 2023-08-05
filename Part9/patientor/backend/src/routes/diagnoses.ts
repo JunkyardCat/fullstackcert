@@ -12,4 +12,9 @@ router.post("/", (_req, res) => {
   res.send("saving a diagnoses");
 });
 
+router.get('/:codes',(req, res) => {
+  const codes = req.params.codes.split(',')
+  res.send(diagnosesService.getDiagCode(codes))
+})
+
 export default router;
