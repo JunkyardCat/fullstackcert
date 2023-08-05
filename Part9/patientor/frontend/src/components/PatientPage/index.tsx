@@ -57,6 +57,21 @@ const PatientPage = () => {
       </div>
       <Typography variant="body1">ssn: {patient.ssn}</Typography>
       <Typography variant="body1">occupation: {patient.occupation}</Typography>
+      <div>
+        <Typography variant='h5'>entries</Typography>
+        {
+          patient.entries && patient.entries.map((x,y)=>(
+            <div key={y}>
+              <Typography variant='body1'>{x.date} {x.description}</Typography>
+              {x.diagnosisCodes && (
+                <ul>
+                  {x.diagnosisCodes.map((a,b)=>(<li key={b}>{a}</li>))}
+                </ul>
+              )}
+            </div>
+          ))
+        }
+      </div>
     </div>
   );
 };
