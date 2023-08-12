@@ -1,0 +1,10 @@
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+
+{
+    "author": "mario",
+    "url": "nintendo.com",
+    "title": "super mario vr",
+    "likes": 0
+    
+}
