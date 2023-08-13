@@ -1,0 +1,10 @@
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImlhbWx1aWdpQGdtYWlsLmNvbSIsImlkIjoxLCJpYXQiOjE2OTE5MzUyNDl9.RBu_ZNFXr2M1lr2l_AcxpSi4tTGqM1aPqTprClBPQrg
+
+{
+    "author": "luigi",
+    "url": "nintendo.com",
+    "title": "super luigi vr",
+    "likes": 0
+}

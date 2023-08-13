@@ -1,12 +1,34 @@
+const jwt = require('jsonwebtoken')
 const router = require('express').Router()
-const {Blog} = require('../models')
+const {Blog, User} = require('../models')
+const { SECRET } = require('../util/config')
 
 const blogFinder = async (req, res, next) => {
     req.blog = await Blog.findByPk(req.params.id)
-    console.log('inside blogFinder', req.params.id, req.blog)
-    console.log('inside blogFinder 02', req.blog.likes)
+    //console.log('inside blogFinder', req.params.id, req.blog)
+    //console.log('inside blogFinder 02', req.blog.likes)
     next()
 }
+
+const tokenExtractor = (req, res, next) => {
+    const authorization = req.get('authorization')
+    //console.log('auth token: ',authorization, SECRET, authorization.substring(7))
+    if(authorization && authorization.toLowerCase().startsWith('bearer')) {
+        try{
+            //console.log('im inside the try')
+            //console.log('what the',jwt.verify(authorization.substring(7), SECRET))
+
+            req.decodedToken = jwt.verify(authorization.substring(7), SECRET)
+            console.log('im inside here extractor', req.decodedToken)
+        }catch{
+            return res.status(401).json({error: 'token invalid'})
+        }
+    }else{
+        return res.status(401).json({error: 'token missing'})
+    }
+    next()
+}
+
 /*
 const errorHandler = (error, request, response, next) =>{
     console.error('inside error handler')
@@ -17,17 +39,26 @@ const errorHandler = (error, request, response, next) =>{
 
 router.get('/', async(req, res) => {
     //const blogs = await sequelize.query("SELECT * FROM blogs", {type:QueryTypes.SELECT})
-    const blogs = await Blog.findAll()
+    const blogs = await Blog.findAll({
+        attributes: {exclude:['userId']},
+        include:{
+            model: User,
+            attributes:['name']
+        }
+    })
     res.json(blogs)
 })
 
-router.post('/', async (req,res,next) => {
-    console.log(req.body, typeof req.body)
+router.post('/', tokenExtractor, async (req,res,next) => {
+    //console.log(req.body, typeof req.body)
     try{
-        const blog = await Blog.create(req.body)
+        //const user = await User.findOne()
+        //const blog = await Blog.create({...req.body, userId:user.id})
+        const user = await User.findByPk(req.decodedToken.id)
+        const blog = await Blog.create({...req.body, userId:user.id, date: new Date()})
         res.json(blog)
     }catch(error){
-        console.log('inside post error catch')
+        //console.log('inside post error catch')
         //return res.status(400).json({error})
         next(error)
     }
@@ -49,7 +80,7 @@ router.get('/:id', blogFinder, async (req,res) => {
     }
 })
 
-router.delete('/:id', blogFinder, async (req,res) => {
+router.delete('/:id', tokenExtractor,blogFinder, async (req,res) => {
     //console.log(req.params.id)
     /*
     const blog = await Blog.findByPk(req.params.id)
@@ -61,12 +92,40 @@ router.delete('/:id', blogFinder, async (req,res) => {
     }
     res.status(204).end()
     */
-        
+
+    //const user = req.username
+    //const blog = await Blog.findByPk(req.params.id)
+    /*
+    const user = await User.findOne({
+        where:{
+            username: req.body.username
+        }
+    })
+    */
+    //req.blog.userId === req.body.username
+    
+    if(!req.decodedToken.id){
+        return res.status(401).json({error: 'token invalid'})
+    }
+
+    console.log('inside delete',req.blog, req.decodedToken.id)
+
+        if(req.blog.userId === req.decodedToken.id){
+            console.log('user matched')
+            await req.blog.destroy()
+            res.status(204).end()
+        }else{
+            res.status(401).json({error: 'unauthorized operation'})
+        }
+    }
+
+       /* 
     if(req.blog){
         await req.blog.destroy()
     }
     res.status(204).end()
-})
+    */
+)
 
 router.put('/:id', blogFinder, async (req,res,next) => {
     /*
@@ -81,7 +140,7 @@ router.put('/:id', blogFinder, async (req,res,next) => {
     */
     try{
         if(req.blog){
-            console.log('inside put if',req.blog, req.body)
+            //console.log('inside put if',req.blog, req.body)
             req.blog.likes = req.body.likes
             await req.blog.save()
             res.json(req.blog)
