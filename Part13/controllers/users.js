@@ -1,13 +1,23 @@
 const router = require('express').Router()
 const {User} = require('../models')
 const {Blog} = require('../models')
+const {sequelize} = require('../util/db')
 
 router.get('/', async (req,res) => {
+    //const blogs = await sequelize.query("SELECT * FROM blogs", {type:QueryTypes.SELECT})
+    
+    //attributes: {exclude:['userId']}
     const users = await User.findAll({
+        attributes: [
+            'name',
+            [sequelize.fn('sum', sequelize.col('likes')),'totalLikes'],
+            [sequelize.fn('COUNT', sequelize.col('title')),'totalBlogs']
+        ],
         include: {
             model: Blog,
-            attributes: {exclude:['userId']}
-        }
+            attributes: []
+        },
+        group: ['user.id']
     })
     res.json(users)
 })

@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken')
 const router = require('express').Router()
 const {Blog, User} = require('../models')
 const { SECRET } = require('../util/config')
+const { Op } = require('sequelize')
 
 const blogFinder = async (req, res, next) => {
     req.blog = await Blog.findByPk(req.params.id)
@@ -38,13 +39,48 @@ const errorHandler = (error, request, response, next) =>{
 */
 
 router.get('/', async(req, res) => {
+    //const where = {}
+    /*
+    if(req.query.search){
+        where.title = {
+            [Op.substring]: req.query.search,
+        }
+        where.user = {
+            [Op.substring]: req.query.search
+        }
+    }
+    */
+    let where = {}
+   if(req.query.search){
+        where = {
+            [Op.or]: [
+                
+                    {title:{[Op.substring]: req.query.search}},
+                    {author:{[Op.substring]: req.query.search}}
+                
+            ]
+        }
+   }
+    /*
+    if(req.query.search){
+        where: {
+            [Op.or]: [
+                {title: {[Op.substring]: req.query.search}},
+                {name: {[Op.substring]: req.query.search}},
+            ]
+        }
+    }
+    */
+    console.log('inside get', where)
     //const blogs = await sequelize.query("SELECT * FROM blogs", {type:QueryTypes.SELECT})
     const blogs = await Blog.findAll({
         attributes: {exclude:['userId']},
         include:{
             model: User,
             attributes:['name']
-        }
+        },
+        where,
+        order:[['likes', 'DESC']]
     })
     res.json(blogs)
 })
