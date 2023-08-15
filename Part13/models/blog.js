@@ -26,10 +26,22 @@ Blog.init({
         type: DataTypes.INTEGER,
         defaultValue: 0,
     },
+    year: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate:{
+            isWithinRange(value){
+                const currentYear = new Date().getFullYear()
+                if(value<1991 || value>currentYear){
+                    throw new Error('year must be between 1991 and this year')
+                }
+            }
+        }
+    }
 },{
     sequelize,
     underscored: true,
-    timestamps: false,
+    timestamps: true,
     modelName: 'blog'
 })
 
