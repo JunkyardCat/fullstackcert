@@ -1,8 +1,9 @@
-const jwt = require('jsonwebtoken')
+//const jwt = require('jsonwebtoken')
 const router = require('express').Router()
 const {Blog, User} = require('../models')
-const { SECRET } = require('../util/config')
+//const { SECRET } = require('../util/config')
 const { Op } = require('sequelize')
+const {tokenExtractor} = require('../util/middleware')
 
 const blogFinder = async (req, res, next) => {
     req.blog = await Blog.findByPk(req.params.id)
@@ -10,7 +11,7 @@ const blogFinder = async (req, res, next) => {
     //console.log('inside blogFinder 02', req.blog.likes)
     next()
 }
-
+/*
 const tokenExtractor = (req, res, next) => {
     const authorization = req.get('authorization')
     //console.log('auth token: ',authorization, SECRET, authorization.substring(7))
@@ -29,7 +30,7 @@ const tokenExtractor = (req, res, next) => {
     }
     next()
 }
-
+*/
 /*
 const errorHandler = (error, request, response, next) =>{
     console.error('inside error handler')
@@ -91,6 +92,7 @@ router.post('/', tokenExtractor, async (req,res,next) => {
         //const user = await User.findOne()
         //const blog = await Blog.create({...req.body, userId:user.id})
         const user = await User.findByPk(req.decodedToken.id)
+        console.log('inside create blog', user, user.id)
         const blog = await Blog.create({...req.body, userId:user.id, date: new Date()})
         res.json(blog)
     }catch(error){
